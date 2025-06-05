@@ -43,10 +43,10 @@ jobs:
               run: |
                 java -jar schemaspy.jar -t mysql -dp mysql-connector-java.jar -host ${DB_HOST} -port 3306 -db ${DB_NAME} -u ${DB_USER} -p ${DB_PASSWORD} -o ${DB_NAME}/ -s ${DB_NAME} -norows -noviews -noimplied -degree 1
               env:
-                DB_HOST: db
-                DB_USER: root
-                DB_PASSWORD: hoge
-                DB_NAME: fuga
+                DB_HOST: 127.0.0.1
+                DB_USER: user
+                DB_PASSWORD: password
+                DB_NAME: test_db
 
             - name: Upload artifact
               uses: actions/upload-pages-artifact@v3
@@ -59,13 +59,15 @@ jobs:
         services:
             db:
                 image: mysql:8.0
+                env:
+                    MYSQL_ROOT_PASSWORD: rootpassword
+                    MYSQL_DATABASE: test_db
+                    MYSQL_USER: user
+                    MYSQL_PASSWORD: password
                 ports:
                 - 3306:3306
-                env:
-                    MYSQL_ROOT_PASSWORD: hoge
-                    MYSQL_DATABASE: fuga
-                    options: >-
-                        --health-cmd "mysqladmin ping"
-                        --health-interval 10s
-                        --health-timeout 5s
-                        --health-retries 5
+                options: >-
+                    --health-cmd "mysqladmin ping -h localhost -P 3306 -u root -prootpassword"
+                    --health-interval 10s
+                    --health-timeout 5s
+                    --health-retries 5
