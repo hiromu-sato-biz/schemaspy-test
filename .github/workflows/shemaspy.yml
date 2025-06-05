@@ -1,0 +1,69 @@
+name: schemaspy
+
+on:
+    workflow_dispatch:
+
+concurrency:
+    group: schemaspy
+    cancel-in-progress: true
+
+permissions:
+    contents: read
+    pages: write
+    id-token: write
+
+jobs:
+    deploy:
+        environment:
+            name: github-pages
+            url: ${{ steps.deployment.outputs.page_url }}
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+
+            - name: Setup Java
+              uses: actions/setup-java@v3
+
+            - name: Setup Schemaspy
+              run: |
+                curl -o mysql-connector-java.jar -L "https://repo1.maven.org/maven2/mysql/mysql-connector-java/${MYSQL_CONNECTOR_VERSION}/mysql-connector-java-${MYSQL_CONNECTOR_VERSION}.jar"
+                curl -o schemaspy.jar -L "https://github.com/schemaspy/schemaspy/releases/download/v${SCHEMASPY_VERSION}/schemaspy-${SCHEMASPY_VERSION}.jar"
+              env:
+                MYSQL_CONNECTOR_VERSION: 8.0.30
+                SCHEMASPY_VERSION: 6.2.4
+
+            - name: Setup Pages
+              uses: actions/configure-pages@v5
+
+            - name: schemaspy
+              run: |
+                java -jar schemaspy.jar -t mysql -dp mysql-connector-java.jar -host ${DB_HOST} -port 3306 -db ${DB_NAME} -u ${DB_USER} -p ${DB_PASSWORD} -o ${DB_NAME}/ -s ${DB_NAME} -norows -noviews -noimplied -degree 1
+              env:
+                DB_HOST: 127.0.0.1
+                DB_USER: root
+                DB_PASSWORD: hoge
+                DB_NAME: fuga
+
+            - name: Upload artifact
+              uses: actions/upload-pages-artifact@v3
+              with:
+                path: '.'
+
+            - name: Deploy to GitHub Pages
+              id: deployment
+              uses: actions/deploy-pages@v4
+        services:
+            db:
+                image: mysql:8.0
+                ports:
+                - 3306:3306
+                env:
+                    MYSQL_ROOT_PASSWORD: hoge
+                    MYSQL_DATABASE: fuga
+                    MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+                    options: >-
+                        --health-cmd "mysqladmin ping"
+                        --health-interval 10s
+                        --health-timeout 5s
+                        --health-retries 5
