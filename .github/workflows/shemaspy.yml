@@ -3,6 +3,10 @@ name: schemaspy
 on:
     workflow_dispatch:
 
+env:
+    MYSQL_CONNECTOR_VERSION: 8.0.30
+    SCHEMASPY_VERSION: 6.2.4
+
 concurrency:
     group: schemaspy
     cancel-in-progress: true
@@ -32,9 +36,6 @@ jobs:
               run: |
                 curl -o mysql-connector-java.jar -L "https://repo1.maven.org/maven2/mysql/mysql-connector-java/${MYSQL_CONNECTOR_VERSION}/mysql-connector-java-${MYSQL_CONNECTOR_VERSION}.jar"
                 curl -o schemaspy.jar -L "https://github.com/schemaspy/schemaspy/releases/download/v${SCHEMASPY_VERSION}/schemaspy-${SCHEMASPY_VERSION}.jar"
-              env:
-                MYSQL_CONNECTOR_VERSION: 8.0.30
-                SCHEMASPY_VERSION: 6.2.4
 
             - name: Setup Pages
               uses: actions/configure-pages@v5
@@ -46,7 +47,8 @@ jobs:
                 MYSQL_DATABASE: test_db
                 MYSQL_HOST: 127.0.0.1
               run: |
-                mysql -h $MYSQL_HOST -P 3306 -u $MYSQL_USER -p $MYSQL_PASSWORD $MYSQL_DATABASE < init.sql
+                mysql -h ${MYSQL_HOST} -P 3306 -u ${MYSQL_USER} -p${MYSQL_PASSWORD} ${MYSQL_DATABASE} < init.sql
+
             - name: schemaspy
               run: |
                 java -jar schemaspy.jar -t mysql -dp mysql-connector-java.jar -host ${MYSQL_HOST} -port 3306 -db ${MYSQL_DATABASE} -u ${MYSQL_USER} -p ${MYSQL_PASSWORD} -o ${MYSQL_DATABASE}/ -s ${MYSQL_DATABASE} -norows -noviews -noimplied -degree 1
@@ -59,7 +61,9 @@ jobs:
             - name: Upload artifact
               uses: actions/upload-pages-artifact@v3
               with:
-                path: '.'
+                path: './${{ env.MYSQL_DATABASE }}/'
+              env:
+                MYSQL_DATABASE: test_db
 
             - name: Deploy to GitHub Pages
               id: deployment
