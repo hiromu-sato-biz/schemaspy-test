@@ -39,14 +39,22 @@ jobs:
             - name: Setup Pages
               uses: actions/configure-pages@v5
 
+            - name: Create schema and insert test data
+              env:
+                MYSQL_USER: user
+                MYSQL_PASSWORD: password
+                MYSQL_DATABASE: test_db
+                MYSQL_HOST: 127.0.0.1
+              run: |
+                mysql -h $MYSQL_HOST -P 3306 -u $MYSQL_USER -p $MYSQL_PASSWORD $MYSQL_DATABASE < init.sql
             - name: schemaspy
               run: |
-                java -jar schemaspy.jar -t mysql -dp mysql-connector-java.jar -host ${DB_HOST} -port 3306 -db ${DB_NAME} -u ${DB_USER} -p ${DB_PASSWORD} -o ${DB_NAME}/ -s ${DB_NAME} -norows -noviews -noimplied -degree 1
+                java -jar schemaspy.jar -t mysql -dp mysql-connector-java.jar -host ${MYSQL_HOST} -port 3306 -db ${MYSQL_DATABASE} -u ${MYSQL_USER} -p ${MYSQL_PASSWORD} -o ${MYSQL_DATABASE}/ -s ${MYSQL_DATABASE} -norows -noviews -noimplied -degree 1
               env:
-                DB_HOST: 127.0.0.1
-                DB_USER: user
-                DB_PASSWORD: password
-                DB_NAME: test_db
+                MYSQL_USER: user
+                MYSQL_PASSWORD: password
+                MYSQL_DATABASE: test_db
+                MYSQL_HOST: 127.0.0.1
 
             - name: Upload artifact
               uses: actions/upload-pages-artifact@v3
