@@ -43,7 +43,7 @@ jobs:
               run: |
                 java -jar schemaspy.jar -t mysql -dp mysql-connector-java.jar -host ${DB_HOST} -port 3306 -db ${DB_NAME} -u ${DB_USER} -p ${DB_PASSWORD} -o ${DB_NAME}/ -s ${DB_NAME} -norows -noviews -noimplied -degree 1
               env:
-                DB_HOST: 127.0.0.1
+                DB_HOST: db
                 DB_USER: root
                 DB_PASSWORD: hoge
                 DB_NAME: fuga
