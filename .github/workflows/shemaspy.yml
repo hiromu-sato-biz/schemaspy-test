@@ -30,7 +30,7 @@ jobs:
               uses: actions/setup-java@v3
               with:
                 distribution: corretto
-                java-version: 8
+                java-version: 21
 
             - name: Setup Schemaspy
               run: |
@@ -51,7 +51,7 @@ jobs:
 
             - name: schemaspy
               run: |
-                java -jar schemaspy.jar -t mysql -dp mysql-connector-java.jar -host ${MYSQL_HOST} -port 3306 -db ${MYSQL_DATABASE} -u ${MYSQL_USER} -p ${MYSQL_PASSWORD} -o ${MYSQL_DATABASE}/ -s ${MYSQL_DATABASE} -norows -noviews -noimplied -degree 1
+                java -jar schemaspy.jar -t mysql -dp mysql-connector-java.jar -host ${MYSQL_HOST} -port 3306 -db ${MYSQL_DATABASE} -u ${MYSQL_USER} -p ${MYSQL_PASSWORD} -o ${MYSQL_DATABASE}/ -s ${MYSQL_DATABASE} -norows -noviews -noimplied -degree 1 -vizjs
               env:
                 MYSQL_USER: user
                 MYSQL_PASSWORD: password
