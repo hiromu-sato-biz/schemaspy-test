@@ -64,7 +64,6 @@ jobs:
                 env:
                     MYSQL_ROOT_PASSWORD: hoge
                     MYSQL_DATABASE: fuga
-                    MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
                     options: >-
                         --health-cmd "mysqladmin ping"
                         --health-interval 10s
