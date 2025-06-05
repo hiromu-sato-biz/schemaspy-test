@@ -24,6 +24,9 @@ jobs:
 
             - name: Setup Java
               uses: actions/setup-java@v3
+              with:
+                distribution: corretto
+                java-version: 8
 
             - name: Setup Schemaspy
               run: |
